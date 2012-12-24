@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.tomkey.scaleablescrollview.widget.ScaleAbleScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" android:id="@+id/scroll">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" android:id="@+id/root_ll">
+
+        <Gallery
+            android:id="@+id/images_gallery"
+            android:layout_width="match_parent"
+            android:layout_height="240dip"
+            android:layout_marginLeft="-100dip"
+            android:layout_marginRight="-100dip"
+            android:background="#ff000000"
+            android:fadingEdge="none"
+            android:spacing="10.0dip"
+            android:unselectedAlpha="1.0" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#32a232"
+            android:lineSpacingExtra="2dip"
+            android:padding="10dip"
+            android:id="@+id/txt_tv"
+            android:text="文《我认为HTC HERO-ROM支持所谓的多点触摸是个谎言》我觉得太具有攻击性，和我平时的风格不大相符，故撤换之。 
+
+
+看见网上很多人评论HTC的HERO是支持多点触摸的，我也心痒痒了很久。要知道，如果能找到绕过Google实现多点触摸的真理，那将会引起Android软件设计上的一场革命... 
+
+网络上传言HTC的HERO-ROM支持多点触摸的论证大多源于浏览网页和图片时，能像IPhone一样通过手势来控制页面的大小。但是我认为，就算不通过尚未公布的多点触摸（很怀疑HTC目前的电容屏是否只支持两点触摸而已，并不是多点。之前有看过一篇文章介绍电容屏的区别，如果我以后能找到一定贴上来，当然这是题外话了），我们一样能够利用现有的API实现HERO浏览图片和网页的缩放功能。 
+
+主要原理是onTouchEvent事件中的参数MotionEvent，它有一个getSize()方法。在一个点的时候，该方法永远返回0,而在两个触电的时候，该方法则根据两点相对位置变化而返回不同的值。我们只需计算出两点之间的距离变化，距离的大小表明我们希望目标变化的趋势。而getX()和getY()方法则永远座落在两触点之间，这样趋势和目标我们都有了。剩下的就是对目标根据趋势进行放大或缩小即可。 
+
+下边是根据我前边描述的思路编写的代码：让一个蓝色的圆根据手势放大或者缩小。流感中，代码就不指望太清晰了。其实这里涉及到事件分发，它是冒泡事件分发机制，当你在屏幕上点击后，系统会把事件从root view一直向发分发，去找到一个能处理这个事件的view，此时就会先调用onIntercpetEvent()，如果返回false，就会导致onTouchEvent()，如果在action_down返回true，那么说明此时找到能处理这个事件的view了，这里叫做target view，以后的事件如move, up就不会再次查找处理事件，它以后就是直接把move, up发给target view，如果target view没有处理，它就会交给你parent去处理，这样一层一层向上传递，最终会达到root view 根据上图，我们可以看出MyView里的OnTouchEvent只消费了一次点击事件也就是ACTION_DOWN,还没有执行ACTION_UP,然后跑到MyLayout里又去执行了OnTouchEvent事件。
+
+所以根据上面的内容总结如下:
+
+ViewGroup里的onInterceptTouchEvent默认值是false这样才能把事件传给View里的onTouchEvent.
+
+ViewGroup里的onTouchEvent默认值是false。
+
+View里的onTouchEvent返回默认值是true.这样才能执行多次touch事件。
+
+好了以上就是今天分享的内容，谢谢大家！大家有什么不明白的，请留言！！！另外文章标题俩分钟只是个虚头，如果你超过俩分钟才明白，不要喷我啊，哈哈哈！！！" />
+    </LinearLayout>
+
+</com.tomkey.scaleablescrollview.widget.ScaleAbleScrollView>
