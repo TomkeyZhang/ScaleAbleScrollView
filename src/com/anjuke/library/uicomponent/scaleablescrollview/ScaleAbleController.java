@@ -1,7 +1,6 @@
-package com.tomkey.scaleablescrollview.widget;
+package com.anjuke.library.uicomponent.scaleablescrollview;
 
 import android.app.Activity;
-import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -11,29 +10,32 @@ import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
 
+import com.anjuke.library.uicomponent.scaleablescrollview.ScaleAbleScrollView.MotionEventListener;
+import com.anjuke.library.uicomponent.scaleablescrollview.ScaleAbleScrollView.ScrollChangedListener;
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.Animator.AnimatorListener;
 import com.nineoldandroids.animation.ObjectAnimator;
-import com.tomkey.scaleablescrollview.widget.ScaleAbleScrollView.MotionEventListener;
-import com.tomkey.scaleablescrollview.widget.ScaleAbleScrollView.ScrollChangedListener;
+import com.nineoldandroids.animation.ValueAnimator;
+import com.nineoldandroids.animation.ValueAnimator.AnimatorUpdateListener;
 
-public class ScaleAbleController implements OnGestureListener, ScrollChangedListener, AnimatorListener {
-	View topView;
-	int topMiniHeight;
-	int contentHeight;
-	int titleHeight;
-	GestureDetector mGestureDetector;
-	LinearLayout.LayoutParams lp;
-	ObjectAnimator animator;
-	long currentPlayTime = 0l;
-	long totalPlayTime = 800;
-	ScaleAbleScrollView scrollView;
-	View bottomView;
-	Activity activity;
-	float lastY;
-	int[] location = new int[2];
-	float velocityY;
-	Handler handler = new Handler();
+public class ScaleAbleController implements OnGestureListener, ScrollChangedListener, AnimatorListener, AnimatorUpdateListener {
+    private View topView;
+    private int topMiniHeight;
+    private int contentHeight;
+    private int titleHeight;
+    private GestureDetector mGestureDetector;
+    private LinearLayout.LayoutParams lp;
+    private ObjectAnimator animator;
+    private long currentPlayTime = 0l;
+    private long totalPlayTime = 800;
+    private ScaleAbleScrollView scrollView;
+    private View bottomView;
+    private Activity activity;
+    private float lastY;
+    private int[] location = new int[2];
+    private float velocityY;
+    private ScaleListener scaleListener;
+    private boolean isDebug;
 
 	/**
 	 * ScrollView下面必须是一个LinearLayout，LinearLayout的orientation必须是vertical
@@ -47,16 +49,33 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 	 * @param bottomViewId
 	 *            下面自适应的view的id
 	 */
-	public ScaleAbleController(Activity activity, int scrollViewId, int topViewId, int bottomViewId) {
-		this.activity = activity;
+    public ScaleAbleController(Activity activity, int scrollViewId, int topViewId, int bottomViewId, boolean isDebug) {
+        this.isDebug = isDebug;
+        this.activity = activity;
 		this.mGestureDetector = new GestureDetector(activity, this);
 		this.scrollView = (ScaleAbleScrollView) activity.findViewById(scrollViewId);
 		this.topView = activity.findViewById(topViewId);
 		this.bottomView = activity.findViewById(bottomViewId);
 		this.lp = (LinearLayout.LayoutParams) topView.getLayoutParams();
 		this.topMiniHeight = lp.height;
+        this.scaleListener = new ScaleListener() {
+            @Override
+            public void onScale(int height) {
+            }
+
+            @Override
+            public void onReachStart() {
+            }
+
+            @Override
+            public void onReachEnd() {
+            }
+        };
 	}
 
+    public void setScaleListener(ScaleListener scaleListener) {
+        this.scaleListener = scaleListener;
+    }
 	/**
 	 * 初始化方法
 	 */
@@ -75,6 +94,9 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 				DisplayMetrics dm = new DisplayMetrics();
 				activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 				titleHeight = dm.heightPixels - contentHeight;
+                int[] location = new int[2];
+                topView.getLocationOnScreen(location);
+                log("onScroll", "getLocationOnScreen " + location[1] + "contentHeight=" + contentHeight + "-" + scrollView.getHeight());
 			}
 		});
 	}
@@ -87,21 +109,21 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_UP:
-			if (lp.height > topMiniHeight)
-				topView.scrollTo(0, 0);
-			if (topView.getScrollY() == 0 && scrollView.getScrollY() == 0)
+                if (lp.height > topMiniHeight)
+                    topView.scrollTo(0, 0);
+                if (topView.getScrollY() == 0)
 				startAnimator();
-			Log.d("MotionEvent", "ACTION_UP gallery.getScrollY():" + topView.getScrollY() + " scrollView.getScrollY():"
+                log("MotionEvent", "ACTION_UP gallery.getScrollY():" + topView.getScrollY() + " scrollView.getScrollY():"
 					+ scrollView.getScrollY());
 			break;
 		case MotionEvent.ACTION_DOWN:
 			cancelAnimator();
-			Log.d("MotionEvent", "ACTION_DOWN event.getX():" + event.getX() + " event.getY():" + event.getY());
+                log("MotionEvent", "ACTION_DOWN event.getX():" + event.getX() + " event.getY():" + event.getY());
 			break;
 		case MotionEvent.ACTION_MOVE:
 			velocityY = event.getY() - lastY;
 			lastY = event.getY();
-			Log.d("MotionEvent", "ACTION_MOVE event.getX():" + event.getX() + " event.getY():" + event.getY());
+                log("MotionEvent", "ACTION_MOVE event.getX():" + event.getX() + " event.getY():" + event.getY());
 			break;
 
 		default:
@@ -121,6 +143,10 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 
 	}
 
+    private void log(String tag, String msg) {
+        if (isDebug)
+            Log.d(tag, msg);
+    }
 	@Override
 	public boolean onSingleTapUp(MotionEvent e) {
 		float y = adjustY(e.getY());
@@ -134,15 +160,17 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 						totalPlayTime - currentPlayTime);
 				animator.start();
 				animator.addListener(this);
+                animator.addUpdateListener(this);
 			} else if (lp.height == contentHeight) {
 				cancelAnimator();
 				animator = ObjectAnimator.ofInt(this, "h", new int[] { lp.height, topMiniHeight }).setDuration(
 						totalPlayTime - currentPlayTime);
 				animator.start();
 				animator.addListener(this);
+                animator.addUpdateListener(this);
 			}
 		}
-		Log.d("zqt", "onSingleTapUp e.getY() - titleHeight:" + y + " lp.height:" + lp.height + "location[1]: "
+        log("zqt", "onSingleTapUp e.getY() - titleHeight:" + y + " lp.height:" + lp.height + "location[1]: "
 				+ (location[1] - titleHeight));
 		return false;
 	}
@@ -163,10 +191,10 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 	public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
 		if (e1 == null)
 			return false;
-		Log.d("onScroll", "distanceY:" + distanceY + " distanceX:" + distanceX + "scrollView.getScrollY():"
+        log("onScroll", "distanceY:" + distanceY + " distanceX:" + distanceX + "scrollView.getScrollY():"
 				+ scrollView.getScrollY());
-		Log.d("onScroll", "adjustY(e1.getY()):" + adjustY(e1.getY()) + " lp.height:" + lp.height);
-		Log.d("onScroll", "titleHeight: " + titleHeight + "location:" + location[0] + "-" + location[1]);
+        log("onScroll", "adjustY(e1.getY()):" + adjustY(e1.getY()) + " lp.height:" + lp.height);
+        log("onScroll", "titleHeight: " + titleHeight + "location:" + location[0] + "-" + location[1]);
 		// checkHeight();
 		if (scrollView.getScrollY() > 0) {// scrollview未到达顶端,不能缩放gallery的高度
 			Log.d("onScroll", "return false");
@@ -196,7 +224,7 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 	}
 
 	private boolean adjustkHeight(float distanceY) {
-		Log.d("adjustkHeight", "gallery.getScrollY(): " + topView.getScrollY() + "lp.height" + lp.height
+        log("adjustkHeight", "gallery.getScrollY(): " + topView.getScrollY() + "lp.height" + lp.height
 				+ " distanceY: " + distanceY + "scrollView.getScrollY(): " + scrollView.getScrollY());
 		lp.height = lp.height - (int) distanceY;
 		if (lp.height < topMiniHeight) {
@@ -220,13 +248,18 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 			animator.cancel();
 			animator = null;
 		}
-		Log.d("zqt", "cancelAnimator currentPlayTime: " + currentPlayTime);
+        log("zqt", "cancelAnimator currentPlayTime: " + currentPlayTime);
 	}
 
 	private void startAnimator() {
-		Log.d("zqt", "startAnimator gallery.getScrollY():" + topView.getScrollY());
+        log("zqt", "startAnimator gallery.getScrollY():" + topView.getScrollY());
 		if (lp.height <= topMiniHeight || lp.height >= contentHeight) {
 			topView.scrollTo(0, 0);
+            if (lp.height == topMiniHeight) {
+                scaleListener.onReachStart();
+            } else {
+                scaleListener.onReachEnd();
+            }
 			return;
 		}
 		cancelAnimator();
@@ -236,13 +269,15 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 					totalPlayTime - currentPlayTime);
 			animator.start();
 			animator.addListener(this);
-			Log.d("zqt", "放大 startAnimator currentPlayTime: " + currentPlayTime);
+            animator.addUpdateListener(this);
+            log("zqt", "放大 startAnimator currentPlayTime: " + currentPlayTime);
 		} else {
 			animator = ObjectAnimator.ofInt(this, "h", new int[] { lp.height, topMiniHeight }).setDuration(
 					totalPlayTime - currentPlayTime);
 			animator.start();
 			animator.addListener(this);
-			Log.d("zqt", "缩小 startAnimator currentPlayTime: " + currentPlayTime);
+            animator.addUpdateListener(this);
+            log("zqt", "缩小 startAnimator currentPlayTime: " + currentPlayTime);
 		}
 	}
 
@@ -253,11 +288,11 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 
 	@Override
 	public void onScrollChanged(int l, int t, int oldl, int oldt) {
-		Log.d("onScrollChanged ", "scrollView.getScrollY(): " + scrollView.getScrollY());
+        log("onScrollChanged ", "scrollView.getScrollY(): " + scrollView.getScrollY() + " topView.getTop()" + topView.getTop());
 		if (scrollView.getScrollY() > 0) {
 			// 设置gallery的scrollY的值
 			scrollGallery();
-		} else if (scrollView.getScrollY() < 0) {
+        } else if (scrollView.getScrollY() <= 0) {
 			topView.scrollTo(0, 0);
 		}
 	}
@@ -270,9 +305,19 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 	@Override
 	public void onAnimationEnd(Animator animation) {
 		currentPlayTime = 0;
+        int height = (Integer) ((ObjectAnimator) animation).getAnimatedValue();
+        if (height == topMiniHeight) {
+            scaleListener.onReachStart();
+        } else {
+            scaleListener.onReachEnd();
+        }
 	}
-
 	@Override
+    public void onAnimationUpdate(ValueAnimator animation) {
+        scaleListener.onScale((Integer) animation.getAnimatedValue());
+    }
+
+    @Override
 	public void onAnimationCancel(Animator animation) {
 
 	}
@@ -281,4 +326,14 @@ public class ScaleAbleController implements OnGestureListener, ScrollChangedList
 	public void onAnimationRepeat(Animator animation) {
 
 	}
+
+    public interface ScaleListener {
+        void onReachStart();
+
+        void onReachEnd();
+
+        void onScale(int height);
+    }
+
+
 }

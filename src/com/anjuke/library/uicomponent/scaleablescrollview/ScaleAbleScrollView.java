@@ -1,4 +1,4 @@
-package com.tomkey.scaleablescrollview.widget;
+package com.anjuke.library.uicomponent.scaleablescrollview;
 
 import android.content.Context;
 import android.util.AttributeSet;

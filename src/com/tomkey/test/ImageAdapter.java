@@ -1,4 +1,6 @@
-package com.tomkey.scaleablescrollview;
+package com.tomkey.test;
+
+import com.tomkey.scaleablescrollview.R;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
