@@ -23,7 +23,7 @@ public class MainActivity extends Activity implements ScaleListener {
 		gallery.setSelection(10);
         controller = new ScaleAbleController(this, R.id.scroll, R.id.images_gallery, R.id.txt_tv, true);
         controller.setScaleListener(this);
-        controller.init();
+        controller.init(100);
 	}
 
 	@Override
@@ -46,6 +46,16 @@ public class MainActivity extends Activity implements ScaleListener {
     @Override
     public void onScale(int height) {
         Log.d("zqt", "onScale height=" + height);
+    }
+
+    @Override
+    public void onClickStart() {
+        Log.d("zqt", "onClickStart");
+    }
+
+    @Override
+    public void onClickEnd() {
+        Log.d("zqt", "onClickEnd");
     }
 
 }

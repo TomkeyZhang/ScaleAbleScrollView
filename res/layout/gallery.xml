@@ -1,32 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.anjuke.library.uicomponent.scaleablescrollview.ScaleAbleScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" android:id="@+id/scroll">
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical" android:id="@+id/root_ll">
+        android:layout_height="100px"/>
 
-        <Gallery
-            android:id="@+id/images_gallery"
-            android:layout_width="match_parent"
-            android:layout_height="240dip"
-            android:layout_marginLeft="-100dip"
-            android:layout_marginRight="-100dip"
-            android:background="#ff000000"
-            android:fadingEdge="none"
-            android:spacing="10.0dip"
-            android:unselectedAlpha="1.0" />
+    <com.anjuke.library.uicomponent.scaleablescrollview.ScaleAbleScrollView
+        
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/root_ll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#32a232"
-            android:lineSpacingExtra="2dip"
-            android:padding="10dip"
-            android:id="@+id/txt_tv"
-            android:text="文《我认为HTC HERO-ROM支持所谓的多点触摸是个谎言》我觉得太具有攻击性，和我平时的风格不大相符，故撤换之。 
+            android:orientation="vertical" >
+
+            <Gallery
+                android:id="@+id/images_gallery"
+                android:layout_width="match_parent"
+                android:layout_height="240dip"
+                android:layout_marginLeft="-100dip"
+                android:layout_marginRight="-100dip"
+                android:background="#ff000000"
+                android:fadingEdge="none"
+                android:spacing="10.0dip"
+                android:unselectedAlpha="1.0" />
+
+            <TextView
+                android:id="@+id/txt_tv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#32a232"
+                android:lineSpacingExtra="2dip"
+                android:padding="10dip"
+                android:text="文《我认为HTC HERO-ROM支持所谓的多点触摸是个谎言》我觉得太具有攻击性，和我平时的风格不大相符，故撤换之。 
 
 
 看见网上很多人评论HTC的HERO是支持多点触摸的，我也心痒痒了很久。要知道，如果能找到绕过Google实现多点触摸的真理，那将会引起Android软件设计上的一场革命... 
@@ -46,6 +58,7 @@ ViewGroup里的onTouchEvent默认值是false。
 View里的onTouchEvent返回默认值是true.这样才能执行多次touch事件。
 
 好了以上就是今天分享的内容，谢谢大家！大家有什么不明白的，请留言！！！另外文章标题俩分钟只是个虚头，如果你超过俩分钟才明白，不要喷我啊，哈哈哈！！！" />
-    </LinearLayout>
+        </LinearLayout>
+    </com.anjuke.library.uicomponent.scaleablescrollview.ScaleAbleScrollView>
 
-</com.anjuke.library.uicomponent.scaleablescrollview.ScaleAbleScrollView>
+</LinearLayout>

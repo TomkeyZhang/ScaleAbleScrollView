@@ -1,7 +1,5 @@
 package com.tomkey.test;
 
-import com.tomkey.scaleablescrollview.R;
-
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
@@ -12,6 +10,8 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.tomkey.scaleablescrollview.R;
 
 public class ImageAdapter extends BaseAdapter {
 	private final LinearLayout.LayoutParams LAYOUT_TALL = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
@@ -53,11 +53,11 @@ public class ImageAdapter extends BaseAdapter {
 			holder = (Holder) convertView.getTag();
 		}
 		BitmapFactory.decodeResource(context.getResources(), resIds[position % resIds.length], opts);
-		if (opts.outWidth <= opts.outHeight) {
-			holder.item.setLayoutParams(LAYOUT_TALL);
-		} else {
-			holder.item.setLayoutParams(LAYOUT_WIDE);
-		}
+        // if (opts.outWidth <= opts.outHeight) {
+        // holder.item.setLayoutParams(LAYOUT_TALL);
+        // } else {
+        // holder.item.setLayoutParams(LAYOUT_WIDE);
+        // }
 		holder.item.setImageResource(resIds[position % resIds.length]);
 		return convertView;
 	}
