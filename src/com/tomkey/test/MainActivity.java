@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Gallery;
 
 import com.anjuke.library.uicomponent.scaleablescrollview.ScaleAbleController;
@@ -21,9 +23,16 @@ public class MainActivity extends Activity implements ScaleListener {
 		gallery = (Gallery) findViewById(R.id.images_gallery);
 		gallery.setAdapter(new ImageAdapter(this));
 		gallery.setSelection(10);
-        controller = new ScaleAbleController(this, R.id.scroll, R.id.images_gallery, R.id.txt_tv, true);
+        controller = new ScaleAbleController(this, R.id.scroll, R.id.gallery_container, R.id.txt_tv, true);
         controller.setScaleListener(this);
-        controller.init(100);
+        controller.init(100, findViewById(R.id.btn));
+        findViewById(R.id.blank).setOnClickListener(new OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                controller.scaleInAnimation();
+            }
+        });
 	}
 
 	@Override

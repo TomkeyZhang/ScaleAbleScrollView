@@ -57,7 +57,6 @@ public class ScaleAbleScrollView extends ScrollView {
             return touchListener.onTouchEvent(ev) ? true : super.dispatchTouchEvent(ev);
         return super.dispatchTouchEvent(ev);
     }
-
     // @Override
     // public boolean onTouchEvent(MotionEvent ev) {
     // return true;

@@ -6,10 +6,9 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="100px"/>
+        android:layout_height="100px" android:id="@+id/blank"/>
 
     <com.anjuke.library.uicomponent.scaleablescrollview.ScaleAbleScrollView
-        
         android:id="@+id/scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
@@ -20,16 +19,25 @@
             android:layout_height="match_parent"
             android:orientation="vertical" >
 
-            <Gallery
-                android:id="@+id/images_gallery"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="240dip"
-                android:layout_marginLeft="-100dip"
-                android:layout_marginRight="-100dip"
-                android:background="#ff000000"
-                android:fadingEdge="none"
-                android:spacing="10.0dip"
-                android:unselectedAlpha="1.0" />
+                android:layout_height="240dip" android:id="@+id/gallery_container">
+
+                <Gallery
+                    android:id="@+id/images_gallery"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#ff000000"
+                    android:fadingEdge="none"
+                    android:spacing="10.0dip"
+                    android:unselectedAlpha="1.0" />
+
+                <Button
+                    android:id="@+id/btn"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:text="点我" />
+            </FrameLayout>
 
             <TextView
                 android:id="@+id/txt_tv"
